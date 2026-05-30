@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BISTRO ПАНТЮР — Продукты</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0f0f; --card:#1a1a1a; --card2:#212121; --border:#2a2a2a;
+  --accent:#e8c84a; --text:#f0ede6; --muted:#777;
+  --ok:#4ade80; --warn:#e8c84a; --danger:#e85a4a; --plenty:#888;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;}
+
+/* ========== LOGIN SCREEN ========== */
+#loginScreen {
+  display:flex; align-items:center; justify-content:center;
+  min-height:100vh; padding:20px;
+}
+.login-box {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:24px; padding:48px 40px; width:100%; max-width:420px;
+  animation:fadeUp .4s ease;
+}
+.login-logo {
+  text-align:center; margin-bottom:36px;
+}
+.login-logo::before {
+  content:''; display:block; width:40px; height:4px;
+  background:var(--accent); margin:0 auto 16px; border-radius:2px;
+}
+.login-logo h1 {
+  font-family:'Unbounded',sans-serif; font-size:28px; font-weight:900;
+}
+.login-logo h1 span{color:var(--accent);}
+.login-logo p{color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:6px;}
+.login-label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.login-input {
+  width:100%; background:var(--card2); border:1px solid var(--border);
+  border-radius:12px; color:var(--text); font-family:'Manrope',sans-serif;
+  font-size:15px; padding:13px 16px; outline:none; transition:.2s;
+  margin-bottom:16px;
+}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,200,74,.1);}
+.login-btn {
+  width:100%; background:var(--accent); color:#000; border:none;
+  border-radius:12px; font-family:'Unbounded',sans-serif; font-size:13px;
+  font-weight:700; padding:14px; cursor:pointer; transition:.2s; letter-spacing:1px;
+}
+.login-btn:hover{background:#f0d55a;}
+.login-error{color:var(--danger);font-size:12px;text-align:center;margin-top:12px;min-height:18px;}
+.login-hint{color:var(--muted);font-size:11px;text-align:center;margin-top:20px;line-height:1.6;}
+
+/* ========== MAIN APP ========== */
+#app{display:none; padding:40px 20px 80px;}
+
+.header{text-align:center;margin-bottom:40px;}
+.header::before{content:'';display:block;width:50px;height:4px;background:var(--accent);margin:0 auto 20px;border-radius:2px;}
+.header h1{font-family:'Unbounded',sans-serif;font-size:clamp(20px,5vw,42px);font-weight:900;letter-spacing:-1px;}
+.header h1 span{color:var(--accent);}
+.header p{color:var(--muted);margin-top:8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  max-width:1400px;margin:0 auto 32px;padding:0 4px;}
+.user-badge{display:flex;align-items:center;gap:8px;background:var(--card);
+  border:1px solid var(--border);border-radius:50px;padding:8px 16px;font-size:13px;}
+.user-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);}
+.user-dot.admin{background:var(--accent);}
+.user-name{font-weight:600;}
+.user-role{color:var(--muted);font-size:11px;}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:50px;
+  font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-accent{background:var(--accent);color:#000;}
+.btn-accent:hover{background:#f0d55a;}
+.btn-green{background:#4ade80;color:#000;}
+.btn-green:hover{background:#5aee90;}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:#555;background:#222;}
+.btn-danger-soft{background:rgba(232,90,74,.12);color:var(--danger);border:1px solid rgba(232,90,74,.2);}
+.btn-danger-soft:hover{background:rgba(232,90,74,.2);}
+.btn-sm{padding:5px 14px;font-size:12px;}
+
+.toolbar-btns{display:flex;gap:8px;flex-wrap:wrap;}
+
+.last-saved{font-size:11px;color:var(--muted);text-align:center;margin-bottom:24px;letter-spacing:.5px;}
+
+/* LEGEND */
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* SECTIONS */
+.sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;max-width:1400px;margin:0 auto;}
+.section{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .4s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.section-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.section-icon{font-size:17px;}
+.section-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);flex:1;}
+.section-count{font-size:10px;color:var(--muted);background:var(--border);padding:3px 9px;border-radius:20px;}
+
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:8px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+thead th:not(:first-child):not(:nth-child(2)){text-align:center;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.025);}
+td{padding:9px 16px;font-size:13px;vertical-align:middle;}
+.td-num{color:var(--muted);font-size:11px;width:28px;padding-right:0;}
+.td-name{font-weight:500;}
+.td-order{text-align:center;color:var(--muted);}
+.td-stock{text-align:center;}
+.td-status{text-align:center;}
+.td-actions{text-align:center;white-space:nowrap;}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;}
+.badge.ok{background:rgba(74,222,128,.12);color:var(--ok);}
+.badge.warn{background:rgba(232,200,74,.12);color:var(--warn);}
+.badge.danger{background:rgba(232,90,74,.15);color:var(--danger);}
+.badge.plenty{background:rgba(255,255,255,.05);color:var(--muted);}
+
+/* INPUTS */
+.stock-input{background:var(--card2);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);
+  font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;padding:5px 10px;width:90px;
+  outline:none;text-align:center;transition:.2s;}
+.stock-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,200,74,.15);}
+.status-select{background:var(--card2);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);
+  font-family:'Manrope',sans-serif;font-size:12px;padding:5px 8px;outline:none;cursor:pointer;width:100%;}
+.order-input{background:var(--card2);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);
+  font-family:'Manrope',sans-serif;font-size:13px;padding:5px 10px;width:90px;outline:none;text-align:center;transition:.2s;}
+.order-input:focus{border-color:var(--accent);}
+.name-input{background:var(--card2);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);
+  font-family:'Manrope',sans-serif;font-size:13px;padding:5px 10px;width:120px;outline:none;transition:.2s;}
+.name-input:focus{border-color:var(--accent);}
+
+/* ADD ROW */
+.add-row td{background:rgba(232,200,74,.03);border-top:1px dashed rgba(232,200,74,.2)!important;}
+.add-row input{margin:2px;}
+
+/* DELETE BTN */
+.del-btn{background:none;border:none;cursor:pointer;color:#555;font-size:15px;padding:2px 6px;border-radius:6px;transition:.2s;}
+.del-btn:hover{color:var(--danger);background:rgba(232,90,74,.1);}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#1a1a1a;border:1px solid #4ade80;color:#4ade80;
+  padding:12px 28px;border-radius:50px;font-size:14px;font-weight:600;
+  transition:transform .3s ease;z-index:200;pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{border-color:var(--danger);color:var(--danger);}
+
+/* ========== MODAL ========== */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;
+  align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:32px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;animation:fadeUp .3s ease;}
+.modal h2{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;color:var(--accent);margin-bottom:24px;}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;margin-top:-4px;}
+.modal-close:hover{color:var(--text);}
+
+/* HISTORY TABLE */
+.hist-table{width:100%;border-collapse:collapse;font-size:12px;}
+.hist-table th{padding:8px 12px;font-size:10px;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+.hist-table td{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top;}
+.hist-table tr:last-child td{border-bottom:none;}
+.hist-who{font-weight:600;color:var(--text);}
+.hist-time{color:var(--muted);font-size:11px;}
+.hist-what{color:var(--muted);}
+.hist-change{font-family:monospace;font-size:11px;}
+.hist-old{color:var(--danger);}
+.hist-new{color:var(--ok);}
+.hist-empty{text-align:center;color:var(--muted);padding:32px!important;font-size:13px;}
+
+/* STAFF TABLE */
+.staff-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.staff-row{display:flex;align-items:center;gap:10px;background:var(--card2);
+  border:1px solid var(--border);border-radius:12px;padding:12px 16px;}
+.staff-name{flex:1;font-weight:600;}
+.staff-role{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.add-staff{display:flex;gap:8px;flex-wrap:wrap;}
+.staff-input{flex:1;min-width:140px;background:var(--card2);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-family:'Manrope',sans-serif;font-size:14px;
+  padding:10px 14px;outline:none;transition:.2s;}
+.staff-input:focus{border-color:var(--accent);}
+
+@media(max-width:600px){
+  td,thead th{padding:8px 10px;}
+  .section-header{padding:12px 10px;}
+  .stock-input,.order-input{width:68px;}
+  .login-box{padding:32px 24px;}
+  .modal{padding:24px 18px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN ===== -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <h1>BISTRO <span>ПАНТЮР</span></h1>
+      <p>Инвентаризация продуктов</p>
+    </div>
+    <label class="login-label">Ваше имя</label>
+    <input class="login-input" id="loginName" type="text" placeholder="Введите имя..." autocomplete="off"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="passWrap" style="display:none;">
+      <label class="login-label" style="margin-top:4px;">Пароль администратора</label>
+      <input class="login-input" id="loginPass" type="password" placeholder="••••••••"
+        onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">ВОЙТИ →</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">Сотрудники — вводят только имя<br>Надир — вводит имя + пароль</div>
+  </div>
+</div>
+
+<!-- ===== APP ===== -->
+<div id="app">
+  <div class="header">
+    <h1>BISTRO <span>ПАНТЮР</span></h1>
+    <p>Инвентаризация продуктов</p>
+  </div>
+
+  <div class="topbar">
+    <div class="user-badge">
+      <div class="user-dot" id="userDot"></div>
+      <span class="user-name" id="userNameBadge"></span>
+      <span class="user-role" id="userRoleBadge"></span>
+      <span style="color:var(--border);margin:0 4px;">|</span>
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Выйти</button>
+    </div>
+    <div class="toolbar-btns" id="toolbarBtns"></div>
+  </div>
+
+  <div class="last-saved" id="lastSavedInfo"></div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="dot" style="background:var(--ok)"></div>Достаточно</div>
+    <div class="legend-item"><div class="dot" style="background:var(--warn)"></div>Заканчивается</div>
+    <div class="legend-item"><div class="dot" style="background:var(--danger)"></div>Критично</div>
+    <div class="legend-item"><div class="dot" style="background:var(--plenty)"></div>Много</div>
+  </div>
+
+  <div class="sections" id="sections"></div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<!-- История -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('historyModal')">✕</button>
+    <h2>📋 История изменений</h2>
+    <div id="historyContent"></div>
+  </div>
+</div>
+
+<!-- Сотрудники -->
+<div class="modal-overlay" id="staffModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('staffModal')">✕</button>
+    <h2>👥 Управление сотрудниками</h2>
+    <div id="staffContent"></div>
+  </div>
+</div>
+
+<!-- Смена пароля -->
+<div class="modal-overlay" id="passModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('passModal')">✕</button>
+    <h2>🔑 Изменить пароль</h2>
+    <label class="login-label">Текущий пароль</label>
+    <input class="login-input" id="passOld" type="password" placeholder="••••••••">
+    <label class="login-label">Новый пароль</label>
+    <input class="login-input" id="passNew1" type="password" placeholder="••••••••">
+    <label class="login-label">Повторите новый пароль</label>
+    <input class="login-input" id="passNew2" type="password" placeholder="••••••••"
+      onkeydown="if(event.key==='Enter')doChangePass()">
+    <div id="passError" style="color:var(--danger);font-size:12px;margin-bottom:12px;min-height:18px;"></div>
+    <button class="login-btn" onclick="doChangePass()">СОХРАНИТЬ ПАРОЛЬ</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// CONSTANTS
+// ============================================================
+const ADMIN_NAME = 'Надир';
+const ADMIN_PASS_DEFAULT = 'nadmin123';
+let adminPass = ADMIN_PASS_DEFAULT;
+const statusLabels = {ok:'✓',warn:'⚠',danger:'❗',plenty:'∞'};
+const statusOptions = ['ok','warn','danger','plenty'];
+const statusNames   = {ok:'Достаточно',warn:'Заканчивается',danger:'Критично',plenty:'Много'};
+
+const DEFAULT_DATA = [
+  {id:'s1',title:'Сайрен Фуд',icon:'🏪',items:[
+    {id:'i1', name:'Датский',          order:'3 п',   stock:'5 п',    status:'ok'},
+    {id:'i2', name:'Французский',      order:'3 п',   stock:'7 п',    status:'ok'},
+    {id:'i3', name:'Сосиски',          order:'20 кг', stock:'18 кг',  status:'warn'},
+    {id:'i4', name:'Моцарелла корн',   order:'3 кг',  stock:'3 кг',   status:'danger'},
+    {id:'i5', name:'Моцарелла блин',   order:'2 кг',  stock:'6 кг',   status:'ok'},
+    {id:'i6', name:'Гауда',            order:'2 кг',  stock:'7,5 кг', status:'ok'},
+    {id:'i7', name:'Ветчина',          order:'2 кг',  stock:'2 кг',   status:'danger'},
+    {id:'i8', name:'Грудка',           order:'3 кг',  stock:'18 шт',  status:'ok'},
+    {id:'i9', name:'Яйца',             order:'60 шт', stock:'330 шт', status:'ok'},
+    {id:'i10',name:'Мука',             order:'12 кг', stock:'12 кг',  status:'danger'},
+    {id:'i11',name:'Кетчуп',           order:'2 п',   stock:'4 п',    status:'ok'},
+    {id:'i12',name:'Горчица',          order:'2 кг',  stock:'1 кг',   status:'danger'},
+    {id:'i13',name:'Огурцы',           order:'2 п',   stock:'3 п',    status:'ok'},
+    {id:'i14',name:'Кукурузная мука',  order:'3 кг',  stock:'6 кг',   status:'ok'},
+    {id:'i15',name:'Лук',              order:'1 п',   stock:'6 п',    status:'ok'},
+    {id:'i16',name:'Панировочные',     order:'1 п',   stock:'3 п',    status:'ok'},
+    {id:'i17',name:'Сахар стек',       order:'2 кг',  stock:'2 кг',   status:'warn'},
+    {id:'i18',name:'Сахар чуррос',     order:'10 кг', stock:'10 кг',  status:'warn'},
+    {id:'i19',name:'Чай чёрный',       order:'1 п',   stock:'2 п',    status:'ok'},
+    {id:'i20',name:'Чай зелёный',      order:'1 п',   stock:'2 п',    status:'ok'},
+    {id:'i21',name:'Разрыхлитель',     order:'1 п',   stock:'8 п',    status:'ok'},
+    {id:'i22',name:'Сок маленький',    order:'1 бл',  stock:'1 бл',   status:'danger'},
+    {id:'i23',name:'Сгущёнка',         order:'4 л',   stock:'12 л',   status:'ok'},
+    {id:'i24',name:'Ложки',            order:'2 п',   stock:'7 п',    status:'ok'},
+    {id:'i25',name:'Перчатки л',       order:'10 п',  stock:'25 п',   status:'ok'},
+    {id:'i26',name:'Перчатки чёрные',  order:'2 п',   stock:'1 п',    status:'danger'},
+    {id:'i27',name:'Мусорные пакеты',  order:'1 п',   stock:'много',  status:'plenty'},
+    {id:'i28',name:'Мешалки',          order:'1 п',   stock:'много',  status:'plenty'},
+    {id:'i29',name:'Вода 5 л',         order:'5 шт',  stock:'5 шт',   status:'danger'},
+    {id:'i30',name:'Кассовая лента',   order:'12 шт', stock:'20 шт',  status:'ok'},
+    {id:'i31',name:'Трубочки соломка', order:'1 п',   stock:'5 п',    status:'ok'},
+    {id:'i32',name:'Салфетки',         order:'1 бл',  stock:'2 бл',   status:'ok'},
+    {id:'i33',name:'Пакеты майка',     order:'2 п',   stock:'много',  status:'plenty'},
+    {id:'i34',name:'Масло сливочное',  order:'5 кг',  stock:'5 кг',   status:'warn'},
+    {id:'i35',name:'Сироп RICHEZA',    order:'1 кор', stock:'1 шт',   status:'danger'},
+  ]},
+  {id:'s2',title:'Артист',icon:'🎨',items:[
+    {id:'i36',name:'Жир фритюрный',order:'70 л', stock:'5 п',  status:'ok'},
+    {id:'i37',name:'Молоко кофе',  order:'3 бл', stock:'7 бл', status:'ok'},
+    {id:'i38',name:'Молоко блины', order:'2 бл', stock:'3 бл', status:'ok'},
+    {id:'i39',name:'Шантипак',     order:'1 бл', stock:'2 бл', status:'ok'},
+  ]},
+  {id:'s3',title:'Магазин',icon:'🛒',items:[
+    {id:'i40',name:'Помидор',         order:'2 кг',  stock:'2 кг',     status:'danger'},
+    {id:'i41',name:'Киви',            order:'2 кг',  stock:'3 кг',     status:'ok'},
+    {id:'i42',name:'Банан',           order:'3 кг',  stock:'10 кг',    status:'ok'},
+    {id:'i43',name:'Яблоко',          order:'3 кг',  stock:'5 кг',     status:'ok'},
+    {id:'i44',name:'Лимон',           order:'2 кг',  stock:'3 кг',     status:'ok'},
+    {id:'i45',name:'Клубника',        order:'1 п',   stock:'4 п',      status:'ok'},
+    {id:'i46',name:'Апельсин',        order:'2 кг',  stock:'4 кг',     status:'ok'},
+    {id:'i47',name:'Имбирь',          order:'2 кг',  stock:'2 кг',     status:'warn'},
+    {id:'i48',name:'Голубика',        order:'1 п',   stock:'4 п',      status:'ok'},
+    {id:'i49',name:'Мята',            order:'4 п',   stock:'9 п',      status:'ok'},
+    {id:'i50',name:'Мёд',             order:'3 шт',  stock:'18 шт',    status:'ok'},
+    {id:'i51',name:'Орео',            order:'5 п',   stock:'4 коробки',status:'ok'},
+    {id:'i52',name:'Сладкая палочка', order:'5 п',   stock:'5 п',      status:'warn'},
+    {id:'i53',name:'Нутелла',         order:'2 бан', stock:'4 бан',    status:'danger'},
+    {id:'i54',name:'Чай травяной',    order:'4 п',   stock:'4 п',      status:'warn'},
+    {id:'i55',name:'Облепиховый',     order:'2 кар', stock:'1 кар',    status:'danger'},
+    {id:'i56',name:'Газовый баллон',  order:'5 п',   stock:'5 п',      status:'warn'},
+    {id:'i57',name:'Чоризо',          order:'1 п',   stock:'1 п',      status:'warn'},
+    {id:'i58',name:'Грибы',           order:'2 шт',  stock:'6 шт',     status:'ok'},
+    {id:'i59',name:'Маслины',         order:'1 шт',  stock:'2 шт',     status:'ok'},
+    {id:'i60',name:'Каперсы',         order:'2 шт',  stock:'100 г',    status:'warn'},
+    {id:'i61',name:'Майонез',         order:'3 шт',  stock:'5 п',      status:'ok'},
+    {id:'i62',name:'Сёмга',           order:'2 шт',  stock:'4 шт',     status:'ok'},
+    {id:'i63',name:'Сметана',         order:'3 шт',  stock:'4 шт',     status:'ok'},
+    {id:'i64',name:'Рикотта',         order:'3 шт',  stock:'4 шт',     status:'ok'},
+    {id:'i65',name:'Сахарная пудра',  order:'1 кар', stock:'1 кор',    status:'ok'},
+    {id:'i66',name:'Шпажки пищевые',  order:'3 п',   stock:'6 п',      status:'ok'},
+    {id:'i67',name:'Контейнер пищ.',  order:'1 кар', stock:'1,5 кар',  status:'ok'},
+    {id:'i68',name:'Дрожжи',          order:'500 г', stock:'6 шт',     status:'ok'},
+    {id:'i69',name:'Какао',           order:'1 кар', stock:'2 п',      status:'ok'},
+    {id:'i70',name:'Вода 0,5 л',      order:'2 бл',  stock:'1 бл',     status:'danger'},
+    {id:'i71',name:'Руккола',         order:'2 п',   stock:'2 п',      status:'warn'},
+    {id:'i72',name:'Шпажки для кор',  order:'5 п',   stock:'2 кор',    status:'ok'},
+    {id:'i73',name:'Протёртые томаты',order:'2 шт',  stock:'2 шт',     status:'warn'},
+    {id:'i74',name:'Соль',            order:'2 шт',  stock:'5 кг',     status:'ok'},
+    {id:'i75',name:'Чупа-чупс',       order:'2 п',   stock:'0,5 п',    status:'danger'},
+  ]},
+  {id:'s4',title:'Склад',icon:'📦',items:[
+    {id:'i76',name:'Чуррос',          order:'10 шт', stock:'12 шт',  status:'ok'},
+    {id:'i77',name:'Карамель',        order:'5 л',   stock:'15 л',   status:'ok'},
+    {id:'i78',name:'Конус',           order:'2 кар', stock:'6 кор',  status:'ok'},
+    {id:'i79',name:'Конверт',         order:'2 кар', stock:'1 кор',  status:'danger'},
+    {id:'i80',name:'Стакан 0,4',      order:'2 кар', stock:'2 кор',  status:'warn'},
+    {id:'i81',name:'Стакан 0,3',      order:'2 кар', stock:'2 кор',  status:'warn'},
+    {id:'i82',name:'Стакан вафельный',order:'1 кар', stock:'1 кар',  status:'warn'},
+    {id:'i83',name:'Крышка',          order:'1 кар', stock:'1,5 кор',status:'ok'},
+    {id:'i84',name:'Виноградный сок', order:'4 кор', stock:'4 шт',   status:'danger'},
+  ]},
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null; // {name, isAdmin}
+let appData = DEFAULT_DATA;
+let staffList = ['Феруз','Жасур','Барно','Санжар']; // default staff
+let history  = [];
+let editMode = false;
+
+// ============================================================
+// LOGIN
+// ============================================================
+document.getElementById('loginName').addEventListener('input', function(){
+  const isNadir = this.value.trim().toLowerCase() === ADMIN_NAME.toLowerCase();
+  document.getElementById('passWrap').style.display = isNadir ? 'block' : 'none';
+  document.getElementById('loginError').textContent = '';
+});
+
+async function doLogin() {
+  const nameRaw = document.getElementById('loginName').value.trim();
+  const pass    = document.getElementById('loginPass').value;
+  if (!nameRaw) { document.getElementById('loginError').textContent = '⚠ Введите имя'; return; }
+
+  const isNadir = nameRaw.toLowerCase() === ADMIN_NAME.toLowerCase();
+
+  if (isNadir) {
+    if (pass !== adminPass) {
+      document.getElementById('loginError').textContent = '❌ Неверный пароль';
+      return;
+    }
+    currentUser = {name: ADMIN_NAME, isAdmin: true};
+  } else {
+    // Load staff list from cloud to verify
+    await loadStaff();
+    const found = staffList.find(s => s.toLowerCase() === nameRaw.toLowerCase());
+    if (!found) {
+      document.getElementById('loginError').textContent = '❌ Такого сотрудника нет. Попросите Надира добавить вас.';
+      return;
+    }
+    currentUser = {name: found, isAdmin: false};
+  }
+
+  await loadAllData();
+  showApp();
+}
+
+// ============================================================
+// JSONBIN STORAGE
+// ============================================================
+const JSONBIN_API_KEY = '$2a$10$VKEMrudT7NbIDEcSBbvKse3lESPow2Hpt2tcoZedrAZERb1tmRY5q';
+const JSONBIN_BASE    = 'https://api.jsonbin.io/v3';
+let binId = null; // will be loaded or created
+
+async function jbGet() {
+  if (!binId) return null;
+  const r = await fetch(`${JSONBIN_BASE}/b/${binId}/latest`, {
+    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+  });
+  if (!r.ok) return null;
+  const j = await r.json();
+  return j.record || null;
+}
+
+async function jbSet(record) {
+  if (!binId) {
+    // Create new bin
+    const r = await fetch(`${JSONBIN_BASE}/b`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': JSONBIN_API_KEY,
+        'X-Bin-Name': 'bistro-pantur',
+        'X-Bin-Private': 'true'
+      },
+      body: JSON.stringify(record)
+    });
+    if (!r.ok) throw new Error('create failed');
+    const j = await r.json();
+    binId = j.metadata.id;
+    // Save binId to localStorage so we find it next time
+    localStorage.setItem('bistro_bin_id', binId);
+    return;
+  }
+  const r = await fetch(`${JSONBIN_BASE}/b/${binId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Master-Key': JSONBIN_API_KEY
+    },
+    body: JSON.stringify(record)
+  });
+  if (!r.ok) throw new Error('update failed');
+}
+
+async function initBin() {
+  // Try to find existing bin
+  binId = localStorage.getItem('bistro_bin_id') || null;
+  if (!binId) {
+    // Search by name
+    try {
+      const r = await fetch(`${JSONBIN_BASE}/b?page=1`, {
+        headers: { 'X-Master-Key': JSONBIN_API_KEY }
+      });
+      // not all plans support listing, just create fresh if not found
+    } catch(e) {}
+  }
+}
+
+// ============================================================
+// DATA LAYER — wraps JSONBin
+// ============================================================
+let cloudRecord = null; // full record cached
+
+async function loadAllData() {
+  await initBin();
+  try {
+    cloudRecord = await jbGet();
+  } catch(e) { cloudRecord = null; }
+
+  if (cloudRecord) {
+    if (cloudRecord.appData)   appData   = cloudRecord.appData;
+    if (cloudRecord.staffList) staffList = cloudRecord.staffList;
+    if (cloudRecord.history)   history   = cloudRecord.history;
+    if (cloudRecord.adminPass) adminPass = cloudRecord.adminPass;
+  }
+}
+
+async function persistAll() {
+  cloudRecord = { appData, staffList, history, adminPass };
+  await jbSet(cloudRecord);
+}
+
+async function loadProductData() { /* handled in loadAllData */ }
+async function loadStaff() {
+  await initBin();
+  try {
+    const r = await jbGet();
+    if (r && r.staffList) staffList = r.staffList;
+    if (r && r.adminPass) adminPass = r.adminPass;
+  } catch(e) {}
+}
+async function loadHistory()  { /* handled in loadAllData */ }
+async function loadPass()     { /* handled in loadAllData */ }
+
+async function saveProductData() { await persistAll(); }
+async function saveStaff()       { await persistAll(); }
+async function saveHistory()     {
+  if (history.length > 100) history = history.slice(-100);
+  await persistAll();
+}
+async function savePass(newPass) {
+  adminPass = newPass;
+  await persistAll();
+}
+
+function addHistory(changes) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+  history.push({ who: currentUser.name, when: dateStr, changes });
+}
+
+// ============================================================
+// SHOW APP
+// ============================================================
+function showApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+
+  // Badge
+  document.getElementById('userNameBadge').textContent = currentUser.name;
+  document.getElementById('userRoleBadge').textContent = currentUser.isAdmin ? '👑 Администратор' : '👤 Сотрудник';
+  const dot = document.getElementById('userDot');
+  dot.className = 'user-dot' + (currentUser.isAdmin ? ' admin' : '');
+
+  buildToolbar();
+  render();
+  updateLastSaved();
+}
+
+function updateLastSaved() {
+  const el = document.getElementById('lastSavedInfo');
+  if (history.length > 0) {
+    const last = history[history.length - 1];
+    el.textContent = `Последнее изменение: ${last.who} — ${last.when}`;
+  } else {
+    el.textContent = '';
+  }
+}
+
+function buildToolbar() {
+  const tb = document.getElementById('toolbarBtns');
+  tb.innerHTML = '';
+  if (currentUser.isAdmin) {
+    tb.innerHTML = `
+      <button class="btn btn-accent" onclick="toggleEdit()"  id="editToggle">✏️ Редактировать</button>
+      <button class="btn btn-green"  onclick="saveChanges()" id="saveBtn" style="display:none">💾 Сохранить</button>
+      <button class="btn btn-ghost"  onclick="openHistory()">📋 История</button>
+      <button class="btn btn-ghost"  onclick="openStaff()">👥 Сотрудники</button>
+      <button class="btn btn-ghost"  onclick="openChangePass()">🔑 Пароль</button>
+    `;
+  } else {
+    tb.innerHTML = `
+      <button class="btn btn-accent" onclick="toggleStaffEdit()" id="staffEditToggle">✏️ Изменить склад</button>
+      <button class="btn btn-green"  onclick="saveStaffChanges()" id="staffSaveBtn" style="display:none">💾 Сохранить</button>
+    `;
+  }
+}
+
+function logout() {
+  currentUser = null; editMode = false;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginName').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('passWrap').style.display = 'none';
+  document.getElementById('loginError').textContent = '';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  const container = document.getElementById('sections');
+  container.innerHTML = '';
+  appData.forEach((sec, si) => {
+    const isSkl = sec.id === 's4'; // Склад
+    const canEdit = currentUser.isAdmin ? editMode : (editMode && isSkl);
+    const card = document.createElement('div');
+    card.className = 'section';
+    card.style.animationDelay = (si * 0.05) + 's';
+
+    const adminActions = currentUser.isAdmin && editMode;
+
+    let rows = sec.items.map((item, ii) => `
+      <tr data-sid="${sec.id}" data-iid="${item.id}">
+        <td class="td-num">${ii+1}</td>
+        <td class="td-name">
+          ${adminActions
+            ? `<input class="name-input" value="${esc(item.name)}" oninput="updateName('${sec.id}','${item.id}',this.value)">`
+            : esc(item.name)}
+        </td>
+        <td class="td-order">
+          ${adminActions
+            ? `<input class="order-input" value="${esc(item.order)}" oninput="updateOrder('${sec.id}','${item.id}',this.value)">`
+            : item.order}
+        </td>
+        <td class="td-stock">
+          ${canEdit
+            ? `<input class="stock-input" value="${esc(item.stock)}" oninput="updateStock('${sec.id}','${item.id}',this.value)">`
+            : `<span class="badge ${item.status}">${statusLabels[item.status]} ${item.stock}</span>`}
+        </td>
+        <td class="td-status">
+          ${canEdit
+            ? `<select class="status-select" onchange="updateStatus('${sec.id}','${item.id}',this.value)">
+                ${statusOptions.map(s=>`<option value="${s}" ${item.status===s?'selected':''}>${statusNames[s]}</option>`).join('')}
+              </select>`
+            : `<span class="badge ${item.status}">${statusNames[item.status]}</span>`}
+        </td>
+        ${adminActions ? `<td class="td-actions"><button class="del-btn" onclick="deleteItem('${sec.id}','${item.id}')" title="Удалить">✕</button></td>` : ''}
+      </tr>
+    `).join('');
+
+    // Add-row for admin
+    let addRow = '';
+    if (adminActions) {
+      addRow = `<tr class="add-row">
+        <td></td>
+        <td><input class="name-input" id="new_name_${sec.id}" placeholder="Название"></td>
+        <td><input class="order-input" id="new_order_${sec.id}" placeholder="Заказ"></td>
+        <td><input class="stock-input" id="new_stock_${sec.id}" placeholder="Есть"></td>
+        <td>
+          <select class="status-select" id="new_status_${sec.id}">
+            ${statusOptions.map(s=>`<option value="${s}">${statusNames[s]}</option>`).join('')}
+          </select>
+        </td>
+        <td><button class="btn btn-accent btn-sm" onclick="addItem('${sec.id}')">+ Добавить</button></td>
+      </tr>`;
+    }
+
+    const hasStatusCol = canEdit || currentUser.isAdmin;
+
+    card.innerHTML = `
+      <div class="section-header">
+        <span class="section-icon">${sec.icon}</span>
+        <span class="section-title">${sec.title}</span>
+        <span class="section-count">${sec.items.length} позиций</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th></th><th>Продукт</th><th>Заказ</th><th>Есть</th>
+            <th>Статус</th>
+            ${adminActions ? '<th></th>' : ''}
+          </tr></thead>
+          <tbody>${rows}${addRow}</tbody>
+        </table>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ============================================================
+// EDIT — ADMIN
+// ============================================================
+function toggleEdit() {
+  editMode = !editMode;
+  document.getElementById('editToggle').textContent = editMode ? '👁 Просмотр' : '✏️ Редактировать';
+  document.getElementById('saveBtn').style.display = editMode ? 'inline-flex' : 'none';
+  render();
+}
+
+// ============================================================
+// EDIT — STAFF (Склад only)
+// ============================================================
+let staffEditMode = false;
+let staffSnapshot = null; // snapshot before editing
+
+function toggleStaffEdit() {
+  staffEditMode = !staffEditMode;
+  editMode = staffEditMode;
+  document.getElementById('staffEditToggle').textContent = staffEditMode ? '👁 Просмотр' : '✏️ Изменить склад';
+  document.getElementById('staffSaveBtn').style.display = staffEditMode ? 'inline-flex' : 'none';
+  if (staffEditMode) {
+    // Snapshot current Склад data
+    staffSnapshot = JSON.parse(JSON.stringify(appData.find(s=>s.id==='s4')));
+  }
+  render();
+}
+
+async function saveStaffChanges() {
+  const skl = appData.find(s=>s.id==='s4');
+  const snap = staffSnapshot;
+  const changes = [];
+  if (skl && snap) {
+    skl.items.forEach(item => {
+      const old = snap.items.find(i=>i.id===item.id);
+      if (old && (old.stock !== item.stock || old.status !== item.status)) {
+        changes.push({
+          product: item.name,
+          field: 'stock/status',
+          old: `${old.stock} (${statusNames[old.status]})`,
+          new: `${item.stock} (${statusNames[item.status]})`
+        });
+      }
+    });
+  }
+  if (changes.length === 0) {
+    showToast('Нет изменений', false);
+    staffEditMode = false; editMode = false;
+    document.getElementById('staffEditToggle').textContent = '✏️ Изменить склад';
+    document.getElementById('staffSaveBtn').style.display = 'none';
+    render(); return;
+  }
+  try {
+    addHistory(changes);
+    await saveProductData();
+    await saveHistory();
+    staffEditMode = false; editMode = false;
+    staffSnapshot = null;
+    document.getElementById('staffEditToggle').textContent = '✏️ Изменить склад';
+    document.getElementById('staffSaveBtn').style.display = 'none';
+    updateLastSaved();
+    render();
+    showToast('✅ Сохранено! Все увидят изменения.');
+  } catch(e) { showToast('❌ Ошибка сохранения', true); }
+}
+
+async function saveChanges() {
+  try {
+    await saveProductData();
+    await saveHistory();
+    editMode = false;
+    document.getElementById('editToggle').textContent = '✏️ Редактировать';
+    document.getElementById('saveBtn').style.display = 'none';
+    updateLastSaved();
+    render();
+    showToast('✅ Сохранено!');
+  } catch(e) { showToast('❌ Ошибка сохранения', true); }
+}
+
+// ============================================================
+// DATA MUTATIONS
+// ============================================================
+function updateStock(sid, iid, val) {
+  const item = getItem(sid, iid);
+  if (item) item.stock = val;
+}
+function updateStatus(sid, iid, val) {
+  const item = getItem(sid, iid);
+  if (item) item.status = val;
+}
+function updateName(sid, iid, val) {
+  const item = getItem(sid, iid);
+  if (item) item.name = val;
+}
+function updateOrder(sid, iid, val) {
+  const item = getItem(sid, iid);
+  if (item) item.order = val;
+}
+function getItem(sid, iid) {
+  const sec = appData.find(s=>s.id===sid);
+  return sec && sec.items.find(i=>i.id===iid);
+}
+
+function deleteItem(sid, iid) {
+  const sec = appData.find(s=>s.id===sid);
+  if (!sec) return;
+  const item = sec.items.find(i=>i.id===iid);
+  if (!item) return;
+  if (!confirm(`Удалить «${item.name}»?`)) return;
+  sec.items = sec.items.filter(i=>i.id!==iid);
+  addHistory([{product: item.name, field:'удалено', old:'—', new:'удалён'}]);
+  render();
+}
+
+function addItem(sid) {
+  const sec = appData.find(s=>s.id===sid);
+  if (!sec) return;
+  const name   = document.getElementById(`new_name_${sid}`).value.trim();
+  const order  = document.getElementById(`new_order_${sid}`).value.trim();
+  const stock  = document.getElementById(`new_stock_${sid}`).value.trim();
+  const status = document.getElementById(`new_status_${sid}`).value;
+  if (!name) { showToast('⚠ Введите название', true); return; }
+  const newId = 'i' + Date.now();
+  sec.items.push({id: newId, name, order: order||'—', stock: stock||'—', status});
+  addHistory([{product: name, field:'добавлено', old:'—', new:`${stock} (${statusNames[status]})`}]);
+  render();
+  showToast(`✅ «${name}» добавлен`);
+}
+
+// ============================================================
+// HISTORY MODAL
+// ============================================================
+function openHistory() {
+  const el = document.getElementById('historyContent');
+  if (history.length === 0) {
+    el.innerHTML = '<table class="hist-table"><tbody><tr><td class="hist-empty">История пуста</td></tr></tbody></table>';
+  } else {
+    const rows = [...history].reverse().map(h => {
+      const changesHtml = h.changes.map(c =>
+        `<div class="hist-change">• ${esc(c.product)}: <span class="hist-old">${esc(c.old)}</span> → <span class="hist-new">${esc(c.new)}</span></div>`
+      ).join('');
+      return `<tr>
+        <td><span class="hist-who">${esc(h.who)}</span><br><span class="hist-time">${h.when}</span></td>
+        <td class="hist-what">${changesHtml}</td>
+      </tr>`;
+    }).join('');
+    el.innerHTML = `<table class="hist-table">
+      <thead><tr><th>Кто / Когда</th><th>Что изменено</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+  // Admin can clear history
+  el.innerHTML += `<div style="text-align:right;margin-top:16px;">
+    <button class="btn btn-danger-soft btn-sm" onclick="clearHistory()">🗑 Очистить историю</button>
+  </div>`;
+  openModal('historyModal');
+}
+
+async function clearHistory() {
+  if (!confirm('Очистить всю историю?')) return;
+  history = [];
+  await saveHistory();
+  updateLastSaved();
+  closeModal('historyModal');
+  showToast('🗑 История очищена');
+}
+
+// ============================================================
+// STAFF MODAL
+// ============================================================
+function openStaff() {
+  renderStaffModal();
+  openModal('staffModal');
+}
+
+function renderStaffModal() {
+  const el = document.getElementById('staffContent');
+  const list = staffList.map((name, i) => `
+    <div class="staff-row">
+      <span class="staff-name">${esc(name)}</span>
+      <span class="staff-role">сотрудник</span>
+      <button class="del-btn" onclick="removeStaff(${i})" title="Удалить">✕</button>
+    </div>
+  `).join('');
+  el.innerHTML = `
+    <div class="staff-list">${list || '<p style="color:var(--muted);font-size:13px;">Нет сотрудников</p>'}</div>
+    <div class="add-staff">
+      <input class="staff-input" id="newStaffName" placeholder="Имя нового сотрудника"
+        onkeydown="if(event.key==='Enter')addStaff()">
+      <button class="btn btn-accent" onclick="addStaff()">+ Добавить</button>
+    </div>
+  `;
+}
+
+async function addStaff() {
+  const name = document.getElementById('newStaffName').value.trim();
+  if (!name) return;
+  if (staffList.find(s=>s.toLowerCase()===name.toLowerCase())) {
+    showToast('⚠ Уже есть', true); return;
+  }
+  staffList.push(name);
+  await saveStaff();
+  renderStaffModal();
+  showToast(`✅ ${name} добавлен`);
+}
+
+async function removeStaff(i) {
+  const name = staffList[i];
+  if (!confirm(`Удалить сотрудника «${name}»?`)) return;
+  staffList.splice(i, 1);
+  await saveStaff();
+  renderStaffModal();
+  showToast(`🗑 ${name} удалён`);
+}
+
+// ============================================================
+// CHANGE PASSWORD
+// ============================================================
+function openChangePass() {
+  document.getElementById('passOld').value = '';
+  document.getElementById('passNew1').value = '';
+  document.getElementById('passNew2').value = '';
+  document.getElementById('passError').textContent = '';
+  openModal('passModal');
+}
+
+async function doChangePass() {
+  const old   = document.getElementById('passOld').value;
+  const new1  = document.getElementById('passNew1').value;
+  const new2  = document.getElementById('passNew2').value;
+  const errEl = document.getElementById('passError');
+  errEl.textContent = '';
+  if (old !== adminPass)        { errEl.textContent = '❌ Неверный текущий пароль'; return; }
+  if (new1.length < 4)          { errEl.textContent = '⚠ Пароль должен быть минимум 4 символа'; return; }
+  if (new1 !== new2)            { errEl.textContent = '❌ Пароли не совпадают'; return; }
+  try {
+    await savePass(new1);
+    closeModal('passModal');
+    showToast('✅ Пароль изменён!');
+  } catch(e) { errEl.textContent = '❌ Ошибка сохранения'; }
+}
+
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+});
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, isError=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+// Pre-load staff and password so login check works
+initBin().then(() => {
+  jbGet().then(r => {
+    if (r && r.staffList) staffList = r.staffList;
+    if (r && r.adminPass) adminPass = r.adminPass;
+  }).catch(()=>{});
+});
+</script>
+</body>
+</html>
