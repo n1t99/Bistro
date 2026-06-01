@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>BISTRO ПАНТЮР — Умный инвентарь + Telegram</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0f0f; --card:#1a1a1a; --card2:#212121; --border:#2a2a2a;
+  --accent:#e8c84a; --text:#f0ede6; --muted:#777;
+  --ok:#4ade80; --warn:#e8c84a; --danger:#e85a4a; --plenty:#888;
+  --tg:#27a5e7;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Manrope',sans-serif;min-height:100vh;}
+
+#loginScreen {
+  display:flex; align-items:center; justify-content:center;
+  min-height:100vh; padding:20px;
+}
+.login-box {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:24px; padding:48px 40px; width:100%; max-width:420px;
+  animation:fadeUp .4s ease;
+}
+.login-logo {
+  text-align:center; margin-bottom:36px;
+}
+.login-logo::before {
+  content:''; display:block; width:40px; height:4px;
+  background:var(--accent); margin:0 auto 16px; border-radius:2px;
+}
+.login-logo h1 {
+  font-family:'Unbounded',sans-serif; font-size:28px; font-weight:900;
+}
+.login-logo h1 span{color:var(--accent);}
+.login-logo p{color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:6px;}
+.login-label{display:block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.login-input {
+  width:100%; background:var(--card2); border:1px solid var(--border);
+  border-radius:12px; color:var(--text); font-family:'Manrope',sans-serif;
+  font-size:15px; padding:13px 16px; outline:none; transition:.2s;
+  margin-bottom:16px;
+}
+.login-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(232,200,74,.1);}
+.login-btn {
+  width:100%; background:var(--accent); color:#000; border:none;
+  border-radius:12px; font-family:'Unbounded',sans-serif; font-size:13px;
+  font-weight:700; padding:14px; cursor:pointer; transition:.2s; letter-spacing:1px;
+}
+.login-btn:hover{background:#f0d55a;}
+.login-error{color:var(--danger);font-size:12px;text-align:center;margin-top:12px;min-height:18px;}
+.login-hint{color:var(--muted);font-size:11px;text-align:center;margin-top:20px;line-height:1.6;}
+
+#app{display:none; padding:40px 20px 80px;}
+
+.header{text-align:center;margin-bottom:40px;}
+.header::before{content:'';display:block;width:50px;height:4px;background:var(--accent);margin:0 auto 20px;border-radius:2px;}
+.header h1{font-family:'Unbounded',sans-serif;font-size:clamp(20px,5vw,42px);font-weight:900;letter-spacing:-1px;}
+.header h1 span{color:var(--accent);}
+.header p{color:var(--muted);margin-top:8px;font-size:11px;letter-spacing:2px;text-transform:uppercase;}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+  max-width:1400px;margin:0 auto 32px;padding:0 4px;}
+.user-badge{display:flex;align-items:center;gap:8px;background:var(--card);
+  border:1px solid var(--border);border-radius:50px;padding:8px 16px;font-size:13px;}
+.user-dot{width:8px;height:8px;border-radius:50%;background:var(--ok);}
+.user-dot.admin{background:var(--accent);}
+.user-name{font-weight:600;}
+.user-role{color:var(--muted);font-size:11px;}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:50px;
+  font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.btn-accent{background:var(--accent);color:#000;}
+.btn-accent:hover{background:#f0d55a;}
+.btn-green{background:#4ade80;color:#000;}
+.btn-green:hover{background:#5aee90;}
+.btn-tg{background:#27a5e7;color:#fff;}
+.btn-tg:hover{background:#3cb2f0;}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{border-color:#555;background:#222;}
+.btn-danger-soft{background:rgba(232,90,74,.12);color:var(--danger);border:1px solid rgba(232,90,74,.2);}
+.btn-danger-soft:hover{background:rgba(232,90,74,.2);}
+.btn-sm{padding:5px 14px;font-size:12px;}
+
+.toolbar-btns{display:flex;gap:8px;flex-wrap:wrap;}
+.last-saved{font-size:11px;color:var(--muted);text-align:center;margin-bottom:24px;letter-spacing:.5px;}
+.legend{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-bottom:36px;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+.sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px;max-width:1400px;margin:0 auto;}
+.section{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;animation:fadeUp .4s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+.section-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.section-icon{font-size:17px;}
+.section-title{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent);flex:1;}
+.section-count{font-size:10px;color:var(--muted);background:var(--border);padding:3px 9px;border-radius:20px;}
+
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:8px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+thead th:not(:first-child):not(:nth-child(2)){text-align:center;}
+tbody tr{border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(255,255,255,.025);}
+td{padding:9px 16px;font-size:13px;vertical-align:middle;}
+.td-num{color:var(--muted);font-size:11px;width:28px;padding-right:0;}
+.td-name{font-weight:500;}
+.td-order{text-align:center;color:var(--muted);}
+.td-stock{text-align:center;}
+.td-actions{text-align:center;white-space:nowrap;}
+.td-check{text-align:center;width:40px;}
+.checkbox-order{width:18px;height:18px;cursor:pointer;accent-color:var(--accent);}
+
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap;}
+.badge.ok{background:rgba(74,222,128,.12);color:var(--ok);}
+.badge.warn{background:rgba(232,200,74,.12);color:var(--warn);}
+.badge.danger{background:rgba(232,90,74,.15);color:var(--danger);}
+.badge.plenty{background:rgba(255,255,255,.05);color:var(--muted);}
+
+.stock-input{background:var(--card2);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);
+  font-family:'Manrope',sans-serif;font-size:13px;font-weight:600;padding:5px 10px;width:90px;
+  outline:none;text-align:center;transition:.2s;}
+.stock-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(232,200,74,.15);}
+.order-input{background:var(--card2);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);
+  font-family:'Manrope',sans-serif;font-size:13px;padding:5px 10px;width:90px;outline:none;text-align:center;}
+.name-input{background:var(--card2);border:1px solid #3a3a3a;border-radius:8px;color:var(--text);
+  font-family:'Manrope',sans-serif;font-size:13px;padding:5px 10px;width:120px;outline:none;}
+.qty-wrap{display:inline-flex;align-items:center;gap:6px;}
+.qty-btn{width:40px;height:40px;border-radius:8px;border:1px solid #3a3a3a;background:var(--card2);color:var(--text);cursor:pointer;font-size:18px;font-weight:bold;transition:.2s;}
+.qty-btn:hover{background:#2a2a2a;border-color:var(--accent);color:var(--accent);}
+
+.add-row td{background:rgba(232,200,74,.03);border-top:1px dashed rgba(232,200,74,.2)!important;}
+.del-btn{background:none;border:none;cursor:pointer;color:#555;border-radius:6px;}
+.del-btn:hover{color:var(--danger);background:rgba(232,90,74,.1);}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  background:#1a1a1a;border:1px solid #4ade80;color:#4ade80;
+  padding:12px 28px;border-radius:50px;font-size:14px;font-weight:600;
+  transition:transform .3s ease;z-index:200;pointer-events:none;white-space:nowrap;}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast.error{border-color:var(--danger);color:var(--danger);}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;width:100%;max-width:560px;max-height:85vh;overflow-y:auto;}
+.modal h2{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;color:var(--accent);margin-bottom:24px;}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;}
+.hist-table{width:100%;border-collapse:collapse;font-size:12px;}
+.hist-table th{padding:8px;color:var(--muted);text-align:left;border-bottom:1px solid var(--border);}
+.hist-table td{padding:8px;border-bottom:1px solid rgba(255,255,255,.04);}
+.hist-who{font-weight:600;}
+.hist-time{color:var(--muted);font-size:11px;}
+.hist-old{color:var(--danger);}
+.hist-new{color:var(--ok);}
+
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;}
+.team-card{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;align-items:center;gap:12px;}
+.team-avatar{width:42px;height:42px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--accent);}
+.team-name{font-weight:600;font-size:14px;}
+.team-role-tag{font-size:10px;color:var(--muted);}
+
+.search-wrap{max-width:1400px;margin:0 auto 28px;}
+.search-bar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:50px;padding:10px 20px;}
+.search-input{flex:1;background:none;border:none;outline:none;color:var(--text);}
+.search-count{font-size:11px;color:var(--muted);}
+
+.needs-order-block{max-width:1400px;margin:0 auto 28px;}
+.needs-order-card{background:var(--card);border:1px solid rgba(232,90,74,.35);border-radius:16px;}
+.needs-order-header{padding:14px 18px;background:rgba(232,90,74,.08);display:flex;align-items:center;gap:10px;}
+.needs-order-title{font-weight:700;color:var(--danger);flex:1;}
+.needs-order-grid{display:flex;flex-wrap:wrap;gap:8px;padding:14px 18px;}
+.needs-order-tag{background:rgba(232,90,74,.1);border:1px solid rgba(232,90,74,.25);border-radius:50px;padding:5px 12px;font-size:12px;color:var(--danger);}
+
+.order-panel{max-width:1400px;margin:0 auto 28px;}
+.order-card{background:var(--card);border:1px solid var(--accent);border-radius:16px;overflow:hidden;}
+.order-header{padding:14px 18px;background:rgba(232,200,74,.08);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.order-list{padding:14px 18px;max-height:240px;overflow-y:auto;}
+.order-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.order-item-name{flex:1;font-weight:500;}
+.order-item-qty{color:var(--accent);font-weight:600;}
+.empty-order{color:var(--muted);padding:16px;text-align:center;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><h1>BISTRO DE FRANCE <span>ПАНТЮР</span></h1><p>Инвентаризация + Telegram</p></div>
+    <label class="login-label">Ваше имя</label>
+    <input class="login-input" id="loginName" type="text" placeholder="Введите имя..." autocomplete="off">
+    <div id="passWrap" style="display:none;"><label class="login-label">Пароль администратора</label><input class="login-input" id="loginPass" type="password"></div>
+    <button class="login-btn" onclick="doLogin()">ВОЙТИ →</button>
+    <div class="login-error" id="loginError"></div>
+    <div class="login-hint">Сотрудники — только имя<br>Админ  — имя + пароль </div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="header"><h1>BISTRO <span>ПАНТЮР</span></h1><p>Умный инвентарь + Мгновенные уведомления в Telegram</p></div>
+  <div class="topbar"><div class="user-badge"><div class="user-dot" id="userDot"></div><span class="user-name" id="userNameBadge"></span><span class="user-role" id="userRoleBadge"></span><button class="btn btn-ghost btn-sm" onclick="logout()">Выйти</button></div><div class="toolbar-btns" id="toolbarBtns"></div></div>
+  <div class="last-saved" id="lastSavedInfo"></div>
+  <div class="legend"><div class="legend-item"><div class="dot" style="background:var(--ok)"></div>Достаточно</div><div class="legend-item"><div class="dot" style="background:var(--warn)"></div>Мало</div><div class="legend-item"><div class="dot" style="background:var(--danger)"></div>Критично</div></div>
+  
+  <div class="search-wrap"><div class="search-bar"><span>🔍</span><input class="search-input" id="searchInput" placeholder="Поиск продукта..."><span class="search-count" id="searchCount"></span></div></div>
+  <div class="needs-order-block" id="needsOrderBlock"></div>
+  <div class="order-panel" id="orderPanel"></div>
+  <div class="sections" id="sections"></div>
+</div>
+
+<div class="modal-overlay" id="historyModal"><div class="modal"><button class="modal-close" onclick="closeModal('historyModal')">✕</button><h2>📋 История</h2><div id="historyContent"></div></div></div>
+<div class="modal-overlay" id="teamModal"><div class="modal"><button class="modal-close" onclick="closeModal('teamModal')">✕</button><h2>👨‍💼 Команда</h2><div id="teamContent"></div></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== КОНФИГ TELEGRAM ====================
+const TELEGRAM_BOT_TOKEN = "8614832860:AAG0Miso7nIcAtc_EzzkH27Fz17tK4Pn9Ls";
+const TELEGRAM_CHAT_ID = "-5260830375";
+// Три получателя для отправки уведомлений об изменениях
+const TELEGRAM_RECIPIENTS = [
+  "6248621755",           // Твой личный аккаунт
+  "-1002199972357",       // Основная группа
+  "-1003825614444"        // Группа сотрудников
+];
+
+// ==================== ГЛОБАЛЬНЫЕ ДАННЫЕ ====================
+let currentUser = null, editMode = false;
+let appData = [], history = [], staffList = [];
+let adminPass = "nadmin123";
+let selectedOrderItems = new Map();
+let pendingChanges = []; // временное хранилище изменений до отправки в Telegram
+let lastSentTime = 0;
+
+const JSONBIN_API_KEY = "$2a$10$VKEMrudT7NbIDEcSBbvKse3lESPow2Hpt2tcoZedrAZERb1tmRY5q";
+const BIN_ID = "6a1ab4a321f9ee59d29d402d";
+
+const DEFAULT_DATA = [
+  {id:"s1",title:"Сайрен Фуд",icon:"🏪",items:[{id:"i1",name:"Датский",order:"3 п",stock:"5 п"},{id:"i2",name:"Французский",order:"3 п",stock:"7 п"},{id:"i3",name:"Сосиски",order:"20 кг",stock:"18 кг"},{id:"i4",name:"Моцарелла корн",order:"3 кг",stock:"3 кг"},{id:"i10",name:"Мука",order:"12 кг",stock:"12 кг"},{id:"i27",name:"Мусорные пакеты",order:"1 п",stock:"много"}]},
+  {id:"s2",title:"Артист",icon:"🎨",items:[{id:"i36",name:"Жир фритюрный",order:"70 л",stock:"5 п"},{id:"i37",name:"Молоко кофе",order:"3 бл",stock:"7 бл"}]},
+  {id:"s3",title:"Магазин",icon:"🛒",items:[{id:"i40",name:"Помидор",order:"2 кг",stock:"2 кг"},{id:"i46",name:"Апельсин",order:"2 кг",stock:"4 кг"}]},
+  {id:"s4",title:"Склад",icon:"📦",items:[{id:"i76",name:"Чуррос",order:"10 шт",stock:"12 шт"},{id:"i79",name:"Конверт",order:"2 кар",stock:"1 кор"}]}
+];
+const DEFAULT_STAFF = [{name:"Феруз",role:""},{name:"Жасур",role:""},{name:"Барно",role:""},{name:"Санжар",role:""}];
+
+// ==================== ФУНКЦИИ СТАТУСА ====================
+function parseNum(s){ let m = String(s).match(/[\d.,]+/); return m ? parseFloat(m[0].replace(',','.')) : null; }
+function autoStatus(order, stock){
+  let norm=parseNum(order), have=parseNum(stock);
+  if(norm===null||have===null) return 'plenty';
+  let r=have/norm; if(r>=1) return 'ok'; if(r>=0.5) return 'warn'; return 'danger';
+}
+const statusLabels={ok:'✓',warn:'⚠',danger:'❗',plenty:'∞'};
+
+// ==================== TELEGRAM ОТПРАВКА ====================
+async function sendTelegramMessage(text, replyMarkup = null, recipients = null){
+  if(!recipients) recipients = TELEGRAM_RECIPIENTS; // По умолчанию в 3 места
+  
+  for(let chatId of recipients){
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const body = {chat_id:chatId, text:text, parse_mode:"HTML"};
+    if(replyMarkup) body.reply_markup = replyMarkup;
+    try{
+      const res = await fetch(url, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+      if(!res.ok) console.error("Telegram error for chat:", chatId);
+    }catch(e){ console.error(e); }
+  }
+  return true;
+}
+
+// Отправка уведомления об изменении остатков (сбор нескольких изменений за 3 секунды)
+function notifyStockChange(productName, oldVal, newVal, section){
+  const now = Date.now();
+  pendingChanges.push({productName, oldVal, newVal, section, timestamp: now});
+  
+  // Отправляем через 3 секунды после последнего изменения
+  clearTimeout(window.notifyTimeout);
+  window.notifyTimeout = setTimeout(async () => {
+    if(pendingChanges.length === 0) return;
+    const changes = [...pendingChanges];
+    pendingChanges = [];
+    
+    const timeStr = new Date().toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
+    let msg = `📦 <b>${currentUser.name}</b> обновил склад — ${timeStr}\n\n`;
+    for(let ch of changes){
+      const arrow = parseNum(ch.newVal) > parseNum(ch.oldVal) ? '➕' : '➖';
+      msg += `${arrow} <b>${ch.productName}</b> (${ch.section}): ${ch.oldVal} → ${ch.newVal}\n`;
+    }
+    msg += `\n✅ <i>Начальство, проверьте правильность приёмки</i>`;
+    
+    // Кнопки для начальства
+    const replyMarkup = {
+      inline_keyboard: [
+        [{text: "✅ Всё верно", callback_data: "approve"}],
+        [{text: "❌ Есть расхождения", callback_data: "discrepancy"}]
+      ]
+    };
+    await sendTelegramMessage(msg, replyMarkup);
+    showToast(`📤 Уведомление отправлено в Telegram`, false);
+  }, 2500);
+}
+
+// Отправка списка заказа
+async function sendOrderToTelegram(){
+  if(selectedOrderItems.size===0){ showToast("📭 Нет выбранных товаров для заказа", true); return; }
+  let orderText = `<b>🛒 СПИСОК ЗАКАЗА</b>\nСоставил: ${currentUser.name} • ${new Date().toLocaleString()}\n\n`;
+  let i=1;
+  for(let [id, it] of selectedOrderItems.entries()){
+    orderText += `${i}. ${it.name} — ${it.orderQty || it.order}\n`;
+    i++;
+  }
+  orderText += `\n📌 Нажмите кнопку ниже для подтверждения заказа`;
+  
+  const replyMarkup = {
+    inline_keyboard: [
+      [{text: "✅ Подтвердить заказ", callback_data: "confirm_order"}],
+      [{text: "✏️ Редактировать", callback_data: "edit_order"}]
+    ]
+  };
+  await sendTelegramMessage(orderText, replyMarkup);
+  showToast(`📦 Заказ отправлен в Telegram`, false);
+}
+
+// ==================== ЗАГРУЗКА / СОХРАНЕНИЕ ====================
+async function loadAllData(){
+  try{
+    let r = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,{headers:{"X-Master-Key":JSONBIN_API_KEY}});
+    if(r.ok){
+      let data = (await r.json()).record;
+      if(data && data.appData) appData = data.appData;
+      if(data && data.staffList) staffList = data.staffList.map(s=>typeof s==='string'?{name:s,role:''}:s);
+      if(data && data.history) history = data.history;
+      if(data && data.adminPass) adminPass = data.adminPass;
+    }
+  }catch(e){}
+  if(!appData.length) appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  if(!staffList.length) staffList = JSON.parse(JSON.stringify(DEFAULT_STAFF));
+}
+async function persistAll(){
+  let record = {appData, staffList, history, adminPass};
+  await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`,{method:"PUT",headers:{"Content-Type":"application/json","X-Master-Key":JSONBIN_API_KEY},body:JSON.stringify(record)});
+}
+function addHistory(changes){ 
+  history.unshift({who:currentUser.name, when:new Date().toLocaleString(), changes}); 
+  if(history.length>100) history.pop(); 
+  persistAll(); 
+}
+
+// ==================== ЛОГИН ====================
+async function doLogin(){
+  let name = document.getElementById("loginName").value.trim();
+  let pass = document.getElementById("loginPass").value;
+  if(!name){ document.getElementById("loginError").textContent="Введите имя"; return; }
+  await loadAllData();
+  let isNadir = name.toLowerCase() === "надир";
+  if(isNadir){
+    if(pass !== adminPass){ document.getElementById("loginError").textContent="❌ Неверный пароль"; return; }
+    currentUser = {name:"Надир", isAdmin:true};
+  }else{
+    let found = staffList.find(s=>s.name.toLowerCase()===name.toLowerCase());
+    if(!found){ document.getElementById("loginError").textContent="❌ Сотрудник не найден"; return; }
+    currentUser = {name:found.name, role:found.role||"", isAdmin:false};
+  }
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("app").style.display="block";
+  document.getElementById("userNameBadge").textContent=currentUser.name;
+  document.getElementById("userRoleBadge").textContent=currentUser.isAdmin?"👑 Администратор":(currentUser.role||"👤 Сотрудник");
+  document.getElementById("userDot").className="user-dot"+(currentUser.isAdmin?" admin":"");
+  renderToolbar();
+  renderFull();
+  updateLastSaved();
+}
+function renderToolbar(){
+  let tb = document.getElementById("toolbarBtns");
+  if(currentUser.isAdmin){
+    tb.innerHTML = `<button class="btn btn-accent" onclick="toggleEdit()" id="editToggle">✏️ Редактировать</button>
+      <button class="btn btn-green" onclick="saveChanges()" id="saveBtn" style="display:none">💾 Сохранить</button>
+      <button class="btn btn-ghost" onclick="openHistory()">📋 История</button>
+      <button class="btn btn-ghost" onclick="openTeam()">👨‍💼 Команда</button>`;
+  }else{
+    tb.innerHTML = `<button class="btn btn-accent" onclick="toggleStaffEdit()" id="staffEditToggle">✏️ Изменить склад</button>
+      <button class="btn btn-green" onclick="saveStaffChanges()" id="staffSaveBtn" style="display:none">💾 Сохранить</button>
+      <button class="btn btn-ghost" onclick="openTeam()">👨‍💼 Команда</button>`;
+  }
+}
+function updateLastSaved(){ document.getElementById("lastSavedInfo").textContent = history.length?`Последнее: ${history[0].who} — ${history[0].when}`:""; }
+function showToast(msg,err=false){ let t=document.getElementById("toast"); t.textContent=msg; t.className="toast"+(err?" error":""); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2500); }
+
+// ==================== РЕНДЕР ====================
+function renderFull(){
+  let container=document.getElementById("sections");
+  container.innerHTML="";
+  for(let si=0; si<appData.length; si++){
+    let sec=appData[si]; let canEdit = (currentUser.isAdmin && editMode) || (!currentUser.isAdmin && editMode);
+    let adminMode = currentUser.isAdmin && editMode;
+    let rows = sec.items.map((it,ii)=>{
+      let st=autoStatus(it.order,it.stock);
+      let stockCell = "";
+      if(adminMode){
+        stockCell = `<input class="stock-input" value="${it.stock}" oninput="updateStockField('${sec.id}','${it.id}',this.value)">`;
+      }else if(canEdit){
+        let num=parseNum(it.stock); let hasNum=num!==null;
+        stockCell = `<div class="qty-wrap"><button class="qty-btn" onclick="stepStock('${sec.id}','${it.id}',-1,event)">−</button>
+          <input class="stock-input" style="width:60px" data-item-id="${it.id}" data-sec-id="${sec.id}" value="${parseNum(it.stock)??''}" oninput="updateStockNum('${sec.id}','${it.id}',this.value)">
+          <button class="qty-btn" onclick="stepStock('${sec.id}','${it.id}',1,event)">+</button></div>`;
+      }else{
+        stockCell = `<span class="badge ${st}">${statusLabels[st]} ${it.stock}</span>`;
+      }
+      let checkbox = `<input type="checkbox" class="checkbox-order" data-id="${it.id}" data-name="${it.name}" data-order="${it.order}" data-section="${sec.title}" data-stock="${it.stock}" onchange="toggleOrderItem(this)">`;
+      return `<tr><td class="td-num">${ii+1}${'</td><td class="td-name">'}${adminMode?`<input class="name-input" value="${it.name}" oninput="updateNameField('${sec.id}','${it.id}',this.value)">`:it.name}${'</td><td class="td-order">'}${adminMode?`<input class="order-input" value="${it.order}" oninput="updateOrderField('${sec.id}','${it.id}',this.value)">`:it.order}${'</td><td class="td-stock">'}${stockCell}${'</td><td class="td-check">'}${!adminMode?checkbox:''}${'</td>'}${adminMode?`<td class="td-actions"><button class="del-btn" onclick="deleteItem('${sec.id}','${it.id}')">✕</button></td>`:''}${'</tr>'}`;
+    }).join("");
+    let addRow = "";
+    if(adminMode) addRow = `<tr class="add-row"><td></td><td><input class="name-input" id="new_name_${sec.id}" placeholder="Название"></td><td><input class="order-input" id="new_order_${sec.id}" placeholder="Норма"></td><td><input class="stock-input" id="new_stock_${sec.id}" placeholder="Кол-во"><td><button class="btn btn-accent btn-sm" onclick="addItem('${sec.id}')">+</button></td></tr>`;
+    container.innerHTML += `<div class="section"><div class="section-header"><span>${sec.icon}</span><span class="section-title">${sec.title}</span><span class="section-count">${sec.items.length}</span></div><div class="table-wrap"><table><thead><tr><th></th><th>Продукт</th><th>Норма</th><th>Есть</th><th>📦</th>${adminMode?"<th></th>":""}</thead><tbody>${rows}${addRow}</tbody></table></div></div>`;
+  }
+  renderNeedsBlock();
+  renderOrderPanel();
+}
+function renderNeedsBlock(){
+  let dangers=[]; for(let s of appData) for(let i of s.items) if(autoStatus(i.order,i.stock)==='danger') dangers.push({name:i.name,section:s.title});
+  let block=document.getElementById("needsOrderBlock");
+  if(dangers.length===0) block.innerHTML=`<div class="needs-order-card"><div class="needs-order-header"><span>✅</span><span>Всё в норме, заказ не требуется</span></div></div>`;
+  else block.innerHTML=`<div class="needs-order-card"><div class="needs-order-header"><span>❗</span><span>Требует заказа</span><span>${dangers.length}</span></div><div class="needs-order-grid">${dangers.map(d=>`<span class="needs-order-tag">${d.name} (${d.section})</span>`).join("")}</div></div>`;
+}
+function renderOrderPanel(){
+  let panel=document.getElementById("orderPanel");
+  let itemsHtml="", hasAny=false;
+  for(let [id, it] of selectedOrderItems.entries()){
+    hasAny=true;
+    itemsHtml += `<div class="order-item"><span class="order-item-name">${it.name}</span><span class="order-item-qty">${it.orderQty || it.order}</span><button class="btn btn-danger-soft btn-sm" onclick="removeFromOrder('${id}')">✕</button></div>`;
+  }
+  panel.innerHTML = `<div class="order-card"><div class="order-header"><span>🛒 КОРЗИНА ЗАКАЗА (${selectedOrderItems.size})</span><button class="btn btn-tg btn-sm" onclick="sendOrderToTelegram()">📤 Отправить в Telegram</button></div><div class="order-list">${hasAny?itemsHtml:'<div class="empty-order">Выберите товары ✅ для заказа</div>'}</div></div>`;
+}
+function toggleOrderItem(cb){
+  let id=cb.dataset.id, name=cb.dataset.name, order=cb.dataset.order, section=cb.dataset.section, stock=cb.dataset.stock;
+  if(cb.checked) selectedOrderItems.set(id,{name,order,orderQty:order,section,stock});
+  else selectedOrderItems.delete(id);
+  renderOrderPanel();
+}
+function removeFromOrder(id){ selectedOrderItems.delete(id); renderOrderPanel(); document.querySelector(`.checkbox-order[data-id="${id}"]`).checked=false; }
+
+// ==================== РЕДАКТИРОВАНИЕ ====================
+let staffEditMode=false, staffSnapshot=null;
+function toggleEdit(){ editMode=!editMode; document.getElementById("editToggle").textContent=editMode?"👁 Просмотр":"✏️ Редактировать"; document.getElementById("saveBtn").style.display=editMode?"inline-flex":"none"; renderFull(); }
+function toggleStaffEdit(){ staffEditMode=!staffEditMode; editMode=staffEditMode; document.getElementById("staffEditToggle").textContent=staffEditMode?"👁 Просмотр":"✏️ Изменить склад"; document.getElementById("staffSaveBtn").style.display=staffEditMode?"inline-flex":"none"; if(staffEditMode) staffSnapshot=JSON.parse(JSON.stringify(appData)); renderFull(); }
+async function saveStaffChanges(){
+  let changes=[];
+  for(let si=0;si<appData.length;si++) for(let ii=0;ii<appData[si].items.length;ii++){
+    let old=staffSnapshot[si].items[ii].stock, cur=appData[si].items[ii].stock;
+    if(old!==cur){
+      changes.push({product:appData[si].items[ii].name, old, new:cur, section:appData[si].title});
+      // ОТПРАВКА УВЕДОМЛЕНИЯ В TELEGRAM о каждом изменении
+      notifyStockChange(appData[si].items[ii].name, old, cur, appData[si].title);
+    }
+  }
+  if(!changes.length){ showToast("Нет изменений",false); staffEditMode=false; editMode=false; renderFull(); return; }
+  addHistory(changes); await persistAll(); staffEditMode=false; editMode=false; renderFull(); renderToolbar(); updateLastSaved(); showToast("✅ Сохранено, уведомление отправлено",false);
+}
+async function saveChanges(){ await persistAll(); editMode=false; renderFull(); renderToolbar(); updateLastSaved(); showToast("✅ Сохранено",false); }
+function updateStockField(sid,iid,val){ let it=getItem(sid,iid); if(it) it.stock=val; }
+function updateStockNum(sid,iid,num){ let it=getItem(sid,iid); if(it && num){ 
+  let oldVal = it.stock;
+  let newVal = num;
+  it.stock = num;
+  let sec = appData.find(s=>s.id===sid);
+  if(sec && oldVal !== newVal) notifyStockChange(it.name, oldVal, newVal, sec.title);
+} }
+function updateNameField(sid,iid,val){ let it=getItem(sid,iid); if(it) it.name=val; }
+function updateOrderField(sid,iid,val){ let it=getItem(sid,iid); if(it) it.order=val; }
+function getItem(sid,iid){ let s=appData.find(s=>s.id===sid); return s&&s.items.find(i=>i.id===iid); }
+function stepStock(sid,iid,delta,event){ 
+  if(event) event.preventDefault();
+  let it=getItem(sid,iid); 
+  let oldVal = it.stock;
+  let num=parseNum(it.stock); 
+  if(num!==null){ 
+    let newNum=Math.max(0,num+delta); 
+    let unit = it.stock.match(/[а-яa-z]+/i)?(" "+it.stock.match(/[а-яa-z]+/i)[0]):"";
+    let newVal = newNum + unit;
+    it.stock = newVal;
+    
+    // Находим и обновляем input по data-item-id атрибуту
+    let input = document.querySelector(`input.stock-input[data-item-id="${iid}"][data-sec-id="${sid}"]`);
+    if(input) {
+      input.value = newVal;
+    }
+    
+    let sec = appData.find(s=>s.id===sid);
+    if(sec && oldVal !== newVal) notifyStockChange(it.name, oldVal, newVal, sec.title);
+  } 
+}
+function deleteItem(sid,iid){ let s=appData.find(s=>s.id===sid); if(s){ s.items=s.items.filter(i=>i.id!==iid); addHistory([{product:"удалено",old:"",new:""}]); renderFull(); } }
+function addItem(sid){ let s=appData.find(s=>s.id===sid); let name=document.getElementById(`new_name_${sid}`).value, order=document.getElementById(`new_order_${sid}`).value, stock=document.getElementById(`new_stock_${sid}`).value; if(name){ s.items.push({id:"i"+Date.now(),name,order:order||"—",stock:stock||"—"}); renderFull(); } }
+function openHistory(){ let el=document.getElementById("historyContent"); let rows=history.slice(0,30).map(h=>`<tr><td><span class="hist-who">${h.who}</span><br><span class="hist-time">${h.when}</span></td><td>${h.changes.map(c=>`${c.product}: ${c.old} → ${c.new}`).join("; ")}</td></tr>`).join(""); el.innerHTML=`<table class="hist-table">${rows}</table>`; document.getElementById("historyModal").classList.add("open"); }
+function openTeam(){ let el=document.getElementById("teamContent"); let cards=`<div class="team-card"><div class="team-avatar">Н</div><div class="team-info"><div class="team-name">Надир</div><span class="team-role-tag">👑 Админ</span></div></div>`; staffList.forEach(s=>{cards+=`<div class="team-card"><div class="team-avatar">${s.name[0]}</div><div class="team-info"><div class="team-name">${s.name}</div><span class="team-role-tag">${s.role||"Сотрудник"}</span></div></div>`;}); el.innerHTML=`<div class="team-grid">${cards}</div>`; document.getElementById("teamModal").classList.add("open"); }
+function closeModal(id){ document.getElementById(id).classList.remove("open"); }
+function logout(){ location.reload(); }
+
+let searchQuery="";
+function onSearch(q){ searchQuery=q.toLowerCase(); let cnt=0; document.querySelectorAll(".section").forEach(sec=>{let show=false; sec.querySelectorAll("tbody tr:not(.add-row)").forEach(row=>{let name=row.querySelector(".td-name")?.innerText.toLowerCase(); if(name?.includes(searchQuery)){row.style.display=""; show=true; cnt++;}else row.style.display="none";}); sec.style.display=show?"block":"none";}); document.getElementById("searchCount").innerText=cnt?`${cnt} найдено`:""; }
+document.getElementById("searchInput").addEventListener("input",e=>onSearch(e.target.value));
+
+loadAllData().then(()=>{ 
+  document.getElementById("loginName").addEventListener("input",function(){ document.getElementById("passWrap").style.display=this.value.toLowerCase()==="надир"?"block":"none"; }); 
+});
+</script>
+</body>
+</html>
